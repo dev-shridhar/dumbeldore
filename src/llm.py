@@ -5,7 +5,7 @@ from typing import Any
 
 from openai import OpenAI
 
-from dumbledore.config import config
+from config import config
 
 logger = logging.getLogger(__name__)
 
