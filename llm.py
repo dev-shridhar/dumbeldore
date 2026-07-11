@@ -1,12 +1,16 @@
-import httpx
+from __future__ import annotations
+
 import logging
+from typing import Any
+
 from openai import OpenAI
+
 from config import config
 
 logger = logging.getLogger(__name__)
 
 
-def _ollama_chat(messages: list[dict]) -> str | None:
+def _ollama_chat(messages: list[dict[str, Any]]) -> str | None:
     try:
         client = OpenAI(
             base_url=f"{config.ollama_host}/v1",
@@ -14,7 +18,7 @@ def _ollama_chat(messages: list[dict]) -> str | None:
         )
         response = client.chat.completions.create(
             model=config.ollama_model,
-            messages=messages,
+            messages=messages,  # type: ignore[arg-type]
             timeout=config.llm_timeout,
         )
         return response.choices[0].message.content
@@ -23,7 +27,7 @@ def _ollama_chat(messages: list[dict]) -> str | None:
         return None
 
 
-def _groq_chat(messages: list[dict]) -> str | None:
+def _groq_chat(messages: list[dict[str, Any]]) -> str | None:
     if not config.groq_api_key:
         logger.warning("No Groq API key configured")
         return None
@@ -34,7 +38,7 @@ def _groq_chat(messages: list[dict]) -> str | None:
         )
         response = client.chat.completions.create(
             model=config.groq_model,
-            messages=messages,
+            messages=messages,  # type: ignore[arg-type]
             timeout=config.llm_timeout,
         )
         return response.choices[0].message.content
@@ -43,7 +47,7 @@ def _groq_chat(messages: list[dict]) -> str | None:
         return None
 
 
-def chat(messages: list[dict]) -> str:
+def chat(messages: list[dict[str, Any]]) -> str:
     result = _ollama_chat(messages)
     if result:
         return result
