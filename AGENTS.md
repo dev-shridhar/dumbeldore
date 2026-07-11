@@ -92,8 +92,6 @@ All 3 must pass with zero errors before pushing.
 │   └── test_memory.py   # Group memory
 ├── requirements.txt     # Pinned dependencies
 ├── pyproject.toml       # ruff, mypy, pytest config
-├── Procfile             # Railway: worker process
-├── railway.toml         # Railway deploy config
 └── .env                 # Secrets (gitignored)
 ```
 
@@ -153,17 +151,9 @@ Prompts are **versioned** in the `prompts/` directory. Each prompt type has its 
 
 ## Deployment
 
-**Current:** Railway (free tier)  
-**Config:** `Procfile` + `railway.toml`  
 **Entry point:** `python start_bot.py`
 
-### Deployment Steps
-
-1. Code merges to `main` → Railway auto-deploys
-2. Env vars set in Railway dashboard (Variables tab)
-3. Bot runs as a worker process (not a web server)
-
-### PythonAnywhere (alternative, requires paid plan)
+### PythonAnywhere
 
 See `DEPLOY.md` for PythonAnywhere instructions. Requires $10/month Developer plan for always-on tasks.
 
