@@ -121,29 +121,24 @@ mypy --ignore-missing-imports .
 
 2. Open a **Bash console** and run:
    ```bash
-   git clone https://github.com/dev-shridhar/dumbledore.git
+   git clone -b feature/bhargav https://github.com/dev-shridhar/dumbledore.git
    cd dumbledore
    pip3 install -r requirements.txt --user
    ```
 
-3. Go to **Account → Tokens** and create an API token
+3. Go to **Account → Environment variables** and add:
+   - `TELEGRAM_BOT_TOKEN` — from [@BotFather](https://t.me/BotFather)
+   - `GROQ_API_KEY` — from [console.groq.com](https://console.groq.com)
 
-4. Go to **Consoles → New console → Python 3.10**
-
-5. In the Python console, set your environment variables:
-   ```bash
-   export TELEGRAM_BOT_TOKEN="your_token_here"
-   export GROQ_API_KEY="your_groq_key_here"
-   ```
-
-6. Run the bot:
+4. Run the bot:
    ```bash
    python3 run_bot.py
    ```
 
-7. To keep it running 24/7, use **Tasks** tab to schedule the bot to restart
-
-**Note:** PythonAnywhere free tier has CPU time limits. For a production bot, consider Oracle Cloud free VPS or Render.
+**Environment Variables:**
+- **Local dev:** Create a `.env` file (not committed to git)
+- **PythonAnywhere:** Set in Account → Environment variables
+- **GitHub Actions:** Set in repository Settings → Secrets
 
 ## License
 
