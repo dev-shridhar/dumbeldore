@@ -12,12 +12,17 @@ import subprocess
 
 
 def api_call(user: str, token: str, endpoint: str, method: str = "GET",
-             data: str | None = None, content_type: str = "application/json") -> str:
+             data: str | bytes | None = None, content_type: str = "application/json") -> str:
     url = f"https://www.pythonanywhere.com/api/v0/user/{user}/{endpoint}"
     cmd = ["curl", "-s", "-X", method, url, "-H", f"Authorization: Token {token}"]
     if data:
-        cmd.extend(["-H", f"Content-Type: {content_type}", "-d", data])
-    result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd.extend(["-H", f"Content-Type: {content_type}"])
+        if isinstance(data, bytes):
+            cmd.extend(["--data-binary", "@-"])
+        else:
+            cmd.extend(["-d", data])
+    result = subprocess.run(cmd, input=data if isinstance(data, bytes) else None,
+                            capture_output=True, text=True)
     return result.stdout
 
 
@@ -36,8 +41,9 @@ def deploy(token: str, user: str) -> None:
         shell=True, cwd="/tmp/pa_upload", check=True,
     )
     with open("/tmp/dumbledore.tar.gz", "rb") as f:
-        api_call(user, token, "files/path/~/",
-                 method="POST", data=f.read(), content_type="application/gzip")
+        tar_data = f.read()
+    api_call(user, token, "files/path/~/",
+             method="POST", data=tar_data, content_type="application/gzip")
 
     # 2. Install dependencies
     print("\n📥 Installing dependencies...")
