@@ -27,6 +27,14 @@ Dumbledore is a Socratic AI Telegram bot that challenges thinking on system desi
 
 ---
 
+## Conventions
+
+- **Every new folder must have a `README.md`** describing its purpose
+- Use `from __future__ import annotations` at the top of every Python file
+- Follow existing patterns — check neighboring files before writing new code
+
+---
+
 ## CI/CD Pipeline
 
 Defined in `.github/workflows/tests.yml`. Runs on every PR and push to `main`.
