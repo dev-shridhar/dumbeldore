@@ -36,7 +36,6 @@ Track what's done, in progress, and what's next. Tag format: `[status] category:
 ### Infrastructure
 - [x] GitHub repo created and renamed to `dumbledore`
 - [x] bhargavhasabnis invited as admin collaborator
-- [x] `Procfile` + `railway.toml` — Railway deployment config
 - [x] `start_bot.py` — Entry point that loads .env
 
 ---
@@ -44,17 +43,14 @@ Track what's done, in progress, and what's next. Tag format: `[status] category:
 ## 🔄 In Progress
 
 ### Deployment
-- [ ] Railway: Connect GitHub repo in Railway dashboard
-- [ ] Railway: Set env vars (`TELEGRAM_BOT_TOKEN`, `GROQ_API_KEY`)
-- [ ] Railway: Verify bot responds in Telegram after deploy
-- [ ] PythonAnywhere: Alternative hosting (requires $10/month paid plan)
+- [ ] Decide on hosting platform
+- [ ] Deploy bot and verify it responds in Telegram
 
 ---
 
 ## 📋 To Do
 
 ### Features
-- [ ] Add health check endpoint for Railway monitoring
 - [ ] Add rate limiting per group (prevent spam)
 - [ ] Add `/help` with detailed usage instructions per command
 - [ ] Add error handling for Groq API failures (retry, fallback message)
@@ -97,7 +93,6 @@ _No known bugs at this time._
 - **Owner GitHub:** dev-shridhar
 - **Collaborator:** bhargavhasabnis (admin)
 - **PythonAnywhere:** username `dumbledorearchbot` (free tier, no always-on tasks)
-- **Railway:** Primary deployment target (free $5/month credit)
 - **LLM:** Groq API working, Ollama not set up locally yet
 
 ---
@@ -106,5 +101,4 @@ _No known bugs at this time._
 
 - Repo: https://github.com/dev-shridhar/dumbledore
 - Telegram Bot: https://t.me/dumbledore_arch_bot
-- Railway Dashboard: https://railway.app
 - PythonAnywhere: https://www.pythonanywhere.com/account/
