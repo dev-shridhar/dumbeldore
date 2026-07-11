@@ -44,7 +44,8 @@ BOT_USERNAME={os.getenv('BOT_USERNAME', '')}
         f.write(env_content)
 
     # Upload .env file
-    run_cmd(f'pythonanywhere -token "{token}" -user "{user}" files upload .env.deploy dumbledore/.env')
+    cmd = f'pythonanywhere -token "{token}" -user "{user}"'
+    run_cmd(f'{cmd} files upload .env.deploy dumbledore/.env')
     os.remove(".env.deploy")
 
     # 4. Kill existing bot process
