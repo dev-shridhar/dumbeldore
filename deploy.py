@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Deploy script for PythonAnywhere.
+Deploy script for PythonAnywhere using their REST API.
 Usage: python deploy.py --token <PA_TOKEN> --user <PA_USER>
 """
 import argparse
@@ -9,63 +9,53 @@ import subprocess
 import sys
 
 
-def run_cmd(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
-    print(f"Running: {cmd}")
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    if check and result.returncode != 0:
-        print(f"Error: {result.stderr}")
-        sys.exit(1)
-    return result
+def api_call(user: str, token: str, endpoint: str, method: str = "GET",
+             data: str | None = None, content_type: str = "application/json") -> str:
+    url = f"https://www.pythonanywhere.com/api/v0/user/{user}/{endpoint}"
+    cmd = ["curl", "-s", "-X", method, url, "-H", f"Authorization: Token {token}"]
+    if data:
+        cmd.extend(["-H", f"Content-Type: {content_type}", "-d", data])
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return result.stdout
 
 
 def deploy(token: str, user: str) -> None:
     print(f"🚀 Deploying to PythonAnywhere as {user}...")
 
-    # 1. Upload files
+    # 1. Upload files via tar
     print("\n📦 Uploading files...")
-    run_cmd(f'pythonanywhere -token "{token}" -user "{user}" files upload . dumbledore')
+    subprocess.run("find . -type f -not -path './.git/*' -not -path './.github/*' "
+                    "-not -name '.DS_Store' -exec cp --parents {} /tmp/pa_upload/ \\;",
+                    shell=True, check=True)
+    subprocess.run("tar czf /tmp/dumbledore.tar.gz .", shell=True, cwd="/tmp/pa_upload", check=True)
+    with open("/tmp/dumbledore.tar.gz", "rb") as f:
+        api_call(user, token, "files/path/~/",
+                 method="POST", data=f.read(), content_type="application/gzip")
 
     # 2. Install dependencies
     print("\n📥 Installing dependencies...")
-    run_cmd(
-        f'pythonanywhere -token "{token}" -user "{user}" '
-        f'bash "{user}@ssh.pythonanywhere.com" '
-        f'"pip3 install -r ~/dumbledore/requirements.txt --user"'
-    )
+    api_call(user, token, "bash/",
+             data=f'{{"command": "pip3 install -r ~/dumbledore/requirements.txt --user"}}')
 
-    # 3. Create .env file with secrets
+    # 3. Create .env file
     print("\n🔐 Setting environment variables...")
-    env_content = f"""TELEGRAM_BOT_TOKEN={os.getenv('TELEGRAM_BOT_TOKEN', '')}
-GROQ_API_KEY={os.getenv('GROQ_API_KEY', '')}
-BOT_USERNAME={os.getenv('BOT_USERNAME', '')}
-"""
-    # Write env file locally first
-    with open(".env.deploy", "w") as f:
-        f.write(env_content)
+    env_content = (f"TELEGRAM_BOT_TOKEN={os.getenv('TELEGRAM_BOT_TOKEN', '')}\n"
+                   f"GROQ_API_KEY={os.getenv('GROQ_API_KEY', '')}\n"
+                   f"BOT_USERNAME={os.getenv('BOT_USERNAME', '')}\n")
+    escaped_env = env_content.replace("'", "'\\''")
+    api_call(user, token, "bash/",
+             data=f'{{"command": "cat > ~/dumbledore/.env << \'ENVEOF\'\\n{escaped_env}ENVEOF"}}')
 
-    # Upload .env file
-    cmd = f'pythonanywhere -token "{token}" -user "{user}"'
-    run_cmd(f'{cmd} files upload .env.deploy dumbledore/.env')
-    os.remove(".env.deploy")
-
-    # 4. Kill existing bot process
+    # 4. Kill existing process
     print("\n🔄 Restarting bot...")
-    run_cmd(
-        f'pythonanywhere -token "{token}" -user "{user}" '
-        f'bash "{user}@ssh.pythonanywhere.com" '
-        f'"pkill -f \'python3.*run_bot.py\' || true"'
-    )
+    api_call(user, token, "bash/",
+             data='{"command": "pkill -f run_bot.py || true"}')
 
-    # 5. Start bot in background
-    run_cmd(
-        f'pythonanywhere -token "{token}" -user "{user}" '
-        f'bash "{user}@ssh.pythonanywhere.com" '
-        f'"cd ~/dumbledore && nohup python3 run_bot.py > ~/dumbledore/bot.log 2>&1 &"'
-    )
+    # 5. Start bot
+    api_call(user, token, "bash/",
+             data='{"command": "cd ~/dumbledore && nohup python3 run_bot.py > ~/dumbledore/bot.log 2>&1 &"}')
 
     print("\n✅ Deployment complete!")
-    print(f"📊 Check logs: pythonanywhere -token '{token}' -user '{user}' "
-          f'bash "{user}@ssh.pythonanywhere.com" "cat ~/dumbledore/bot.log"')
 
 
 if __name__ == "__main__":
