@@ -42,7 +42,10 @@ async def handle_ask(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if not update.message:
         return
     if not context.args:
-        await update.message.reply_text("Usage: <code>/ask &lt;your question&gt;</code>", parse_mode=ParseMode.HTML)
+        await update.message.reply_text(
+            "Usage: <code>/ask &lt;your question&gt;</code>",
+            parse_mode=ParseMode.HTML,
+        )
         return
 
     query = " ".join(context.args)
