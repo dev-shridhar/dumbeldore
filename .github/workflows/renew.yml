@@ -1,0 +1,27 @@
+name: Auto-Renew FPS.ms Server
+
+on:
+  schedule:
+    - cron: "0 */25 * * *"
+  workflow_dispatch:
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install selenium
+          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
+
+      - name: Renew server
+        env:
+          FPS_SERVER_URL: ${{ vars.FPS_SERVER_URL }}
+        run: python scripts/renew_fps.py
