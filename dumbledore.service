@@ -1,0 +1,15 @@
+[Unit]
+Description=Dumbledore Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/dumbledore
+ExecStart=/usr/bin/python3 /root/dumbledore/start_bot.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
