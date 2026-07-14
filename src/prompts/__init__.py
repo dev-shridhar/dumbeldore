@@ -7,6 +7,7 @@ from prompts.challenge_v1 import CHALLENGE_PROMPT_V1  # noqa: E402
 from prompts.challenge_v2 import CHALLENGE_PROMPT_V2  # noqa: E402
 from prompts.conclude_v1 import CONCLUDE_PROMPT_V1  # noqa: E402
 from prompts.conclude_v2 import CONCLUDE_PROMPT_V2  # noqa: E402
+from prompts.learn_v1 import LEARN_PROMPT_V1  # noqa: E402
 
 VERSION = "2.0.0"
 
@@ -20,4 +21,6 @@ PROMPT_MAP = {
     "conclude": CONCLUDE_PROMPT_V2,
     "conclude_v1": CONCLUDE_PROMPT_V1,
     "conclude_v2": CONCLUDE_PROMPT_V2,
+    "learn": LEARN_PROMPT_V1,
+    "learn_v1": LEARN_PROMPT_V1,
 }

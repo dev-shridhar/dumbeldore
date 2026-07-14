@@ -30,6 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "<b>How to use me:</b>\n"
         "• Reply to any message in this group — I'll probe the reasoning\n"
         "• <code>/ask &lt;question&gt;</code> — Direct expert answer\n"
+        "• <code>/learn &lt;topic&gt;</code> — Learning skeleton for a topic\n"
         "• <code>/conclude</code> — Summarize discussion with the correct answer\n"
         "• <code>/clear</code> — Reset my memory of this group\n"
         "• <code>/status</code> — Show bot status\n"
@@ -55,6 +56,27 @@ async def handle_ask(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     ctx = memory.get_context(chat_id.id)
     messages = build_messages("ask", ctx, query)
+    response = chat(messages)
+    await update.message.reply_text(response, parse_mode=ParseMode.HTML)
+
+
+async def handle_learn(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not update.message:
+        return
+    if not context.args:
+        await update.message.reply_text(
+            "Usage: <code>/learn &lt;topic&gt;</code>\n\n"
+            "Example: <code>/learn URL shortener design</code>",
+            parse_mode=ParseMode.HTML,
+        )
+        return
+
+    query = " ".join(context.args)
+    chat_id = update.effective_chat
+    if not chat_id:
+        return
+
+    messages = build_messages("learn", [], query)
     response = chat(messages)
     await update.message.reply_text(response, parse_mode=ParseMode.HTML)
 
@@ -132,6 +154,7 @@ def main() -> None:
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", start))
     app.add_handler(CommandHandler("ask", handle_ask))
+    app.add_handler(CommandHandler("learn", handle_learn))
     app.add_handler(CommandHandler("conclude", handle_conclude))
     app.add_handler(CommandHandler("clear", handle_clear))
     app.add_handler(CommandHandler("status", handle_status))
