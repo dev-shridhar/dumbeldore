@@ -21,6 +21,11 @@ def test_get_system_prompt_conclude():
     assert "SUMMARY" in prompt or "conclude" in prompt.lower() or "Question" in prompt
 
 
+def test_get_system_prompt_learn():
+    prompt = get_system_prompt("learn")
+    assert "LEARNING SKELETON" in prompt or "skeleton" in prompt.lower()
+
+
 def test_get_system_prompt_invalid():
     try:
         get_system_prompt("invalid")
@@ -50,3 +55,10 @@ def test_build_messages_with_user_query():
     messages = build_messages("conclude", [{"sender": "X", "text": "Use Redis"}], None)
     assert len(messages) == 2
     assert "Redis" in messages[1]["content"]
+
+
+def test_build_messages_learn():
+    messages = build_messages("learn", [], "URL shortener design")
+    assert messages[0]["role"] == "system"
+    assert messages[-1]["content"] == "URL shortener design"
+    assert len(messages) == 2
